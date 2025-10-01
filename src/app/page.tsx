@@ -1,103 +1,209 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
+import Image from 'next/image';
+
+interface WeatherData {
+  weather: Array<{
+    main: string;
+  }>;
+  main: {
+    temp: number;
+    pressure: number;
+    humidity: number;
+  };
+  visibility: number;
+  wind: {
+    speed: number;
+    deg: number;
+  };
+  sys: {
+    country: string;
+    sunrise: number;
+    sunset: number;
+  };
+  name: string;
+}
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [city, setCity] = useState('');
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [isCelsius, setIsCelsius] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const fetchWeather = async (searchCity: string) => {
+    if (!searchCity.trim()) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch('/package2.json');
+      const data = await response.json();
+      if (data.cod === 200) {
+        setWeather(data);
+      }
+    } catch (error) {
+      console.error('Error fetching weather:', error);
+    }
+    setLoading(false);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchWeather(city);
+  };
+
+  const getTemp = (temp: number) => {
+    return isCelsius ? Math.round(temp) : Math.round(temp * 9/5 + 32);
+  };
+
+  const formatTime = (timestamp: number) => {
+    const date = new Date(timestamp * 1000);
+    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+  };
+
+  const metersToKm = (meters: number) => Math.round(meters / 1000);
+  const mpsToMph = (mps: number) => Math.round(mps * 2.237);
+
+  return (
+    <main className="min-h-screen flex items-center justify-center p-8 bg-gray-100">
+      <div className="w-full max-w-md">
+        {/* Home page */}
+        <div
+          className="rounded-[50px] p-6 shadow-2xl relative overflow-hidden"
+          style={{
+            backgroundImage: "url('/background picture.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            minHeight: '844px'
+          }}
+        >
+          {weather ? (
+            <>
+              {/* Search bar */}
+              <form onSubmit={handleSearch} className="relative mb-4">
+                <input
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="w-full px-4 py-2 pl-10 rounded-full bg-white/90 backdrop-blur-sm border-none outline-none text-gray-800 placeholder-gray-500 text-sm"
+                />
+                <button type="submit" className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                  <Image src="/search.png" alt="Search" width={16} height={16} />
+                </button>
+              </form>
+
+              {/* Location */}
+              <div className="text-center mb-8">
+                <h1 className="text-xl font-bold text-black">
+                  {weather.name},{weather.sys.country}
+                </h1>
+              </div>
+
+              {/* Middle section - Weather condition, Temperature, Toggle */}
+              <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full">
+                {/* Weather condition */}
+                <div className="text-center mb-6">
+                  <p className="text-2xl font-regular text-black capitalize">
+                    {weather.weather[0].main}
+                  </p>
+                </div>
+
+                {/* Temperature */}
+                <div className="text-center mb-4">
+                  <div className="text-8xl font-thin text-black leading-none tracking-tight">
+                    {getTemp(weather.main.temp)}°{isCelsius ? 'C' : 'F'}
+                  </div>
+                </div>
+
+                {/* Toggle switch */}
+                <div className="flex justify-center items-center gap-3">
+                  <span className="text-black font-medium text-sm">°C</span>
+                  <button
+                    onClick={() => setIsCelsius(!isCelsius)}
+                    className={`w-12 h-6 rounded-full relative transition-colors ${
+                      isCelsius ? 'bg-gray-400' : 'bg-blue-500'
+                    }`}
+                  >
+                    <div
+                      className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+                        isCelsius ? 'left-0.5' : 'translate-x-6 left-0.5'
+                      }`}
+                    />
+                  </button>
+                  <span className="text-black font-medium text-sm">°F</span>
+                </div>
+              </div>
+
+              {/* Weather details grid - 2x3 layout */}
+              <div className="grid grid-cols-3 gap-3 absolute bottom-6 left-6 right-6">
+                
+                {/* Humidity */}
+                <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-3 flex flex-col items-center justify-center">
+                  <Image src="/humidity.png" alt="Humidity" width={28} height={28} className="mb-2" />
+                  <p className="text-xl font-bold text-black">{weather.main.humidity}%</p>
+                  <p className="text-xs text-black font-medium">Humidity</p>
+                </div>
+
+                {/* Wind */}
+                <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-3 flex flex-col items-center justify-center">
+                  <Image src="/wind speed.png" alt="Wind" width={28} height={28} className="mb-2" />
+                  <p className="text-xl font-bold text-black">{mpsToMph(weather.wind.speed)} mph</p>
+                  <p className="text-xs text-black font-medium">Wind</p>
+                </div>
+
+                {/* Sunrise */}
+                <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-3 flex flex-col items-center justify-center">
+                  <Image src="/sunrise.png" alt="Sunrise" width={28} height={28} className="mb-2" />
+                  <p className="text-xl font-bold text-black">{formatTime(weather.sys.sunrise)}</p>
+                  <p className="text-xs text-black font-medium">Sunrise</p>
+                </div>
+
+                {/* Visibility */}
+                <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-3 flex flex-col items-center justify-center">
+                  <Image src="/visibility.png" alt="Visibility" width={28} height={28} className="mb-2" />
+                  <p className="text-xl font-bold text-black">{metersToKm(weather.visibility)} km</p>
+                  <p className="text-xs text-black font-medium">Visibility</p>
+                </div>
+
+                {/* Pressure */}
+                <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-3 flex flex-col items-center justify-center">
+                  <Image src="/pressure.png" alt="Pressure" width={28} height={28} className="mb-2" />
+                  <p className="text-xl font-bold text-black">{weather.main.pressure} hPa</p>
+                  <p className="text-xs text-black font-medium">Pressure</p>
+                </div>
+
+                {/* Sunset */}
+                <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-3 flex flex-col items-center justify-center">
+                  <Image src="/sunset.png" alt="Sunset" width={28} height={28} className="mb-2" />
+                  <p className="text-xl font-bold text-black">{formatTime(weather.sys.sunset)}</p>
+                  <p className="text-xs text-black font-medium">Sunset</p>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Search bar */}
+              <form onSubmit={handleSearch} className="relative mb-4">
+                <input
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="w-full px-4 py-2 pl-10 rounded-full bg-white/90 backdrop-blur-sm border-none outline-none text-gray-800 placeholder-gray-500 text-sm"
+                />
+                <button type="submit" className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                  <Image src="/search.png" alt="Search" width={16} height={16} />
+                </button>
+              </form>
+              <div className="text-center py-20">
+                <p className="text-xl text-black font-medium">
+                  {loading ? 'Loading...' : 'Search for a city to see weather'}
+                </p>
+              </div>
+            </>
+          )}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </div>
+    </main>
   );
 }
