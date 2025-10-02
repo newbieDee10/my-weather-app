@@ -1,7 +1,7 @@
 'use client';
 
+import { Search, Droplets, Wind, Sunrise, Sunset, Eye, Gauge } from "lucide-react";
 import { useState } from 'react';
-import Image from 'next/image';
 
 interface WeatherData {
   weather: Array<{
@@ -65,17 +65,16 @@ export default function Home() {
   const mpsToMph = (mps: number) => Math.round(mps * 2.237);
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-8 bg-gray-100">
-      <div className="w-full max-w-md">
+    <main className="h-screen w-screen overflow-hidden">
+      <div className="w-full h-full">
         {/* Home page */}
         <div
-          className="rounded-[50px] p-6 shadow-2xl relative overflow-hidden"
+          className="w-full h-full p-6 relative overflow-hidden"
           style={{
             backgroundImage: "url('/background picture.png')",
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            minHeight: '844px'
+            backgroundRepeat: 'no-repeat'
           }}
         >
           {weather ? (
@@ -89,7 +88,7 @@ export default function Home() {
                   className="w-full px-4 py-2 pl-10 rounded-full bg-white/90 backdrop-blur-sm border-none outline-none text-gray-800 placeholder-gray-500 text-sm"
                 />
                 <button type="submit" className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                  <Image src="/search.png" alt="Search" width={16} height={16} />
+                  <Search className="w-4 h-4 text-gray-600" />
                 </button>
               </form>
 
@@ -140,44 +139,44 @@ export default function Home() {
                 
                 {/* Humidity */}
                 <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-3 flex flex-col items-center justify-center">
-                  <Image src="/humidity.png" alt="Humidity" width={28} height={28} className="mb-2" />
+                  <Droplets className="w-7 h-7 text-blue-500 mb-2" />
                   <p className="text-xl font-bold text-black">{weather.main.humidity}%</p>
-                  <p className="text-xs text-black font-medium">Humidity</p>
+                  <p className="text-xs text-black font-small">Humidity</p>
                 </div>
 
                 {/* Wind */}
                 <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-3 flex flex-col items-center justify-center">
-                  <Image src="/wind speed.png" alt="Wind" width={28} height={28} className="mb-2" />
+                  <Wind className="w-7 h-7 text-gray-600 mb-2" />
                   <p className="text-xl font-bold text-black">{mpsToMph(weather.wind.speed)} mph</p>
-                  <p className="text-xs text-black font-medium">Wind</p>
+                  <p className="text-xs text-black font-small">Wind</p>
                 </div>
 
                 {/* Sunrise */}
                 <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-3 flex flex-col items-center justify-center">
-                  <Image src="/sunrise.png" alt="Sunrise" width={28} height={28} className="mb-2" />
+                  <Sunrise className="w-5 h-5 text-orange-500 mb-2" />
                   <p className="text-xl font-bold text-black">{formatTime(weather.sys.sunrise)}</p>
-                  <p className="text-xs text-black font-medium">Sunrise</p>
+                  <p className="text-xs text-black font-small">Sunrise</p>
                 </div>
 
                 {/* Visibility */}
                 <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-3 flex flex-col items-center justify-center">
-                  <Image src="/visibility.png" alt="Visibility" width={28} height={28} className="mb-2" />
+                  <Eye className="w-5 h-5 text-gray-700 mb-2" />
                   <p className="text-xl font-bold text-black">{metersToKm(weather.visibility)} km</p>
-                  <p className="text-xs text-black font-medium">Visibility</p>
+                  <p className="text-xs text-black font-small">Visibility</p>
                 </div>
 
                 {/* Pressure */}
                 <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-3 flex flex-col items-center justify-center">
-                  <Image src="/pressure.png" alt="Pressure" width={28} height={28} className="mb-2" />
+                  <Gauge className="w-5 h-5 text-indigo-600 mb-2" />
                   <p className="text-xl font-bold text-black">{weather.main.pressure} hPa</p>
-                  <p className="text-xs text-black font-medium">Pressure</p>
+                  <p className="text-xs text-black font-small">Pressure</p>
                 </div>
 
                 {/* Sunset */}
                 <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-3 flex flex-col items-center justify-center">
-                  <Image src="/sunset.png" alt="Sunset" width={28} height={28} className="mb-2" />
+                  <Sunset className="w-5 h-5 text-orange-400 mb-2" />
                   <p className="text-xl font-bold text-black">{formatTime(weather.sys.sunset)}</p>
-                  <p className="text-xs text-black font-medium">Sunset</p>
+                  <p className="text-xs text-black font-small">Sunset</p>
                 </div>
               </div>
             </>
@@ -192,7 +191,7 @@ export default function Home() {
                   className="w-full px-4 py-2 pl-10 rounded-full bg-white/90 backdrop-blur-sm border-none outline-none text-gray-800 placeholder-gray-500 text-sm"
                 />
                 <button type="submit" className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                  <Image src="/search.png" alt="Search" width={16} height={16} />
+                  <Search className="w-4 h-4 text-gray-600" />
                 </button>
               </form>
               <div className="text-center py-20">
