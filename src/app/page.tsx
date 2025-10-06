@@ -36,7 +36,7 @@ export default function Home() {
 
     setLoading(true);
     try {
-      const response = await fetch('/package2.json');
+      const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${searchCity}&appid=8d65b434e0cdc0da95db65116d086dc0&units=metric`);
       const data = await response.json();
       if (data.cod === 200) {
         setWeather(data);
@@ -64,6 +64,32 @@ export default function Home() {
   const metersToKm = (meters: number) => Math.round(meters / 1000);
   const mpsToMph = (mps: number) => Math.round(mps * 2.237);
 
+  const getBackgroundImage = () => {
+    if (!weather) return "url('/background picture.png')";
+
+    const condition = weather.weather[0].main.toLowerCase();
+
+    const weatherBackgrounds: { [key: string]: string } = {
+      'clear': '/background picture.png',
+      'clouds': '/clouds.jpg',
+      'rain': '/rainy.jpg',
+      'drizzle': '/rainy.jpg',
+      'thunderstorm': '/rainy.jpg',
+      'snow': '/snow.webp',
+      'mist': '/haze.jpg',
+      'smoke': '/haze.jpg',
+      'haze': '/haze.jpg',
+      'dust': '/haze.jpg',
+      'fog': '/haze.jpg',
+      'sand': '/haze.jpg',
+      'ash': '/haze.jpg',
+      'squall': '/windy.webp',
+      'tornado': '/windy.webp',
+    };
+
+    return `url('${weatherBackgrounds[condition] || '/background picture.png'}')`;
+  };
+
   return (
     <main className="h-screen w-screen overflow-hidden">
       <div className="w-full h-full">
@@ -71,7 +97,7 @@ export default function Home() {
         <div
           className="w-full h-full p-6 relative overflow-hidden"
           style={{
-            backgroundImage: "url('/background picture.png')",
+            backgroundImage: getBackgroundImage(),
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat'
