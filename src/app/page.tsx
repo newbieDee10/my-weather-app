@@ -83,8 +83,8 @@ export default function Home() {
       'fog': '/haze.jpg',
       'sand': '/haze.jpg',
       'ash': '/haze.jpg',
-      'squall': '/windy.webp',
-      'tornado': '/windy.webp',
+      'squall': '/wind.jpg',
+      'tornado': '/wind.jpg',
     };
 
     return `url('${weatherBackgrounds[condition] || '/background picture.png'}')`;
